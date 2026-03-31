@@ -20,7 +20,7 @@ jobs:
       contents: write
 
     env:
-      PORTI_APPCAST_URL: https://raw.githubusercontent.com/zhouk/porti/gh-pages/appcast.xml
+      PORTI_APPCAST_URL: https://github.com/krisphere/porti/releases/latest/download/appcast.xml
 
     steps:
       - name: Check out repository
@@ -75,7 +75,7 @@ jobs:
 
           To publish Sparkle metadata you still need to:
           1. Run scripts/generate-appcast.sh against a folder containing the released zip
-          2. Publish appcast.xml and related files to the public gh-pages branch (or another static host)
+          2. Upload appcast.xml and related files as release assets
 
           This workflow does not export or import the private Sparkle signing key from Keychain.
           EOF
