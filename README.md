@@ -51,7 +51,7 @@ Release setup notes live in [docs/auto-update.md](./docs/auto-update.md).
 To package a distributable app bundle:
 
 ```bash
-PORTI_VERSION="0.1.1" \
+PORTI_VERSION="0.1.2" \
 PORTI_BUILD="1" \
 PORTI_SPARKLE_PUBLIC_KEY="YOUR_BASE64_PUBLIC_KEY" \
 ./scripts/package-app.sh

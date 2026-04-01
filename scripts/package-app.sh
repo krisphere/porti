@@ -5,8 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_NAME="${PORTI_APP_NAME:-Porti}"
 EXECUTABLE_NAME="PortiApp"
 BUNDLE_IDENTIFIER="${PORTI_BUNDLE_IDENTIFIER:-io.github.krisphere.porti}"
-VERSION="${PORTI_VERSION:-0.1.1}"
-BUILD_NUMBER="${PORTI_BUILD:-1}"
+VERSION="${PORTI_VERSION:-0.1.2}"
 APPCAST_URL="${PORTI_APPCAST_URL:-https://github.com/krisphere/porti/releases/latest/download/appcast.xml}"
 SPARKLE_PUBLIC_KEY="${PORTI_SPARKLE_PUBLIC_KEY:-}"
 APP_ICON_SOURCE="${PORTI_APP_ICON_SOURCE:-$ROOT_DIR/packaging/AppIconSource/porti.png}"
@@ -15,6 +14,22 @@ OUTPUT_DIR="${OUTPUT_DIR:-$ROOT_DIR/dist}"
 BIN_DIR=""
 APP_BUNDLE=""
 ZIP_PATH=""
+
+version_to_build_number() {
+  local version="$1"
+  local major=0
+  local minor=0
+  local patch=0
+
+  IFS='.' read -r major minor patch <<< "$version"
+  major="${major:-0}"
+  minor="${minor:-0}"
+  patch="${patch:-0}"
+
+  printf '%d%03d%03d\n' "$major" "$minor" "$patch"
+}
+
+BUILD_NUMBER="${PORTI_BUILD:-$(version_to_build_number "$VERSION")}"
 
 render_icon() {
   local source_png="$1"
