@@ -5,15 +5,44 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_NAME="${PORTI_APP_NAME:-Porti}"
 EXECUTABLE_NAME="PortiApp"
 BUNDLE_IDENTIFIER="${PORTI_BUNDLE_IDENTIFIER:-io.github.krisphere.porti}"
-VERSION="${PORTI_VERSION:-0.1.0}"
+VERSION="${PORTI_VERSION:-0.1.1}"
 BUILD_NUMBER="${PORTI_BUILD:-1}"
 APPCAST_URL="${PORTI_APPCAST_URL:-https://github.com/krisphere/porti/releases/latest/download/appcast.xml}"
 SPARKLE_PUBLIC_KEY="${PORTI_SPARKLE_PUBLIC_KEY:-}"
+APP_ICON_SOURCE="${PORTI_APP_ICON_SOURCE:-$ROOT_DIR/packaging/AppIconSource/porti.png}"
 CONFIGURATION="${CONFIGURATION:-release}"
 OUTPUT_DIR="${OUTPUT_DIR:-$ROOT_DIR/dist}"
 BIN_DIR=""
 APP_BUNDLE=""
 ZIP_PATH=""
+
+render_icon() {
+  local source_png="$1"
+  local output_icns="$2"
+  local iconset_dir
+
+  if [[ ! -f "$source_png" ]]; then
+    echo "icon source not found: $source_png" >&2
+    exit 1
+  fi
+
+  iconset_dir="$(mktemp -d "${TMPDIR:-/tmp}/porti-iconset.XXXXXX").iconset"
+  mv "${iconset_dir%.iconset}" "$iconset_dir"
+
+  sips -z 16 16 "$source_png" --out "$iconset_dir/icon_16x16.png" >/dev/null
+  sips -z 32 32 "$source_png" --out "$iconset_dir/icon_16x16@2x.png" >/dev/null
+  sips -z 32 32 "$source_png" --out "$iconset_dir/icon_32x32.png" >/dev/null
+  sips -z 64 64 "$source_png" --out "$iconset_dir/icon_32x32@2x.png" >/dev/null
+  sips -z 128 128 "$source_png" --out "$iconset_dir/icon_128x128.png" >/dev/null
+  sips -z 256 256 "$source_png" --out "$iconset_dir/icon_128x128@2x.png" >/dev/null
+  sips -z 256 256 "$source_png" --out "$iconset_dir/icon_256x256.png" >/dev/null
+  sips -z 512 512 "$source_png" --out "$iconset_dir/icon_256x256@2x.png" >/dev/null
+  sips -z 512 512 "$source_png" --out "$iconset_dir/icon_512x512.png" >/dev/null
+  cp "$source_png" "$iconset_dir/icon_512x512@2x.png"
+
+  iconutil -c icns "$iconset_dir" -o "$output_icns"
+  rm -rf "$iconset_dir"
+}
 
 if [[ -z "$SPARKLE_PUBLIC_KEY" ]]; then
   echo "PORTI_SPARKLE_PUBLIC_KEY must be set to your Sparkle SUPublicEDKey" >&2
@@ -51,6 +80,7 @@ mkdir -p \
 
 cp "$EXECUTABLE_PATH" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 cp -R "$SPARKLE_FRAMEWORK_PATH" "$APP_BUNDLE/Contents/Frameworks/"
+render_icon "$APP_ICON_SOURCE" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 
 if command -v install_name_tool >/dev/null 2>&1; then
   install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP_BUNDLE/Contents/MacOS/$APP_NAME" 2>/dev/null || true
