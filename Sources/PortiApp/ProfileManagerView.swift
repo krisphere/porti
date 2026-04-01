@@ -3,17 +3,21 @@ import UniformTypeIdentifiers
 
 struct ProfileManagerView: View {
     @ObservedObject var appState: AppState
+    var showsSaveButton: Bool = true
     @State private var draggedProfileID: UUID?
     @State private var dropIndicator: ProfileDropIndicator?
+    @State private var listContentHeight: CGFloat = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Button("Save Current Dock...") {
-                appState.promptAndSaveCurrentDock()
-            }
-            .keyboardShortcut(.defaultAction)
+            if showsSaveButton {
+                Button("Save Current Dock...") {
+                    appState.promptAndSaveCurrentDock()
+                }
+                .keyboardShortcut(.defaultAction)
 
-            Divider()
+                Divider()
+            }
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 4) {
@@ -53,10 +57,27 @@ struct ProfileManagerView: View {
                 }
                 .padding(.vertical, 4)
                 .animation(.spring(response: 0.24, dampingFraction: 0.88), value: appState.profiles.map(\.id))
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .preference(key: ProfileListHeightPreferenceKey.self, value: proxy.size.height)
+                    }
+                }
             }
+            .frame(height: max(listContentHeight, 120))
         }
-        .padding(16)
-        .frame(minWidth: 720, minHeight: 420)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .onPreferenceChange(ProfileListHeightPreferenceKey.self) { newHeight in
+            listContentHeight = newHeight
+        }
+    }
+}
+
+private struct ProfileListHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat = 120
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
@@ -86,41 +107,42 @@ private struct ProfileManagerRowView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .center, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
                 dragHandle
 
-                HStack(alignment: .center, spacing: 8) {
-                    TextField("Profile name", text: $renameDraft)
-                        .textFieldStyle(.roundedBorder)
-                        .focused($isNameFieldFocused)
-                        .onSubmit {
-                            commitRename()
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .center, spacing: 8) {
+                        TextField("Profile name", text: $renameDraft)
+                            .textFieldStyle(.roundedBorder)
+                            .focused($isNameFieldFocused)
+                            .onSubmit {
+                                commitRename()
+                            }
+                            .frame(minWidth: 140, idealWidth: 180, maxWidth: .infinity)
+
+                        Button("Apply") {
+                            appState.apply(storedProfile)
                         }
-                        .frame(minWidth: 220)
+                        Button("Duplicate") {
+                            appState.duplicate(storedProfile)
+                        }
+                        Button("Override") {
+                            appState.overwriteWithCurrentDock(storedProfile)
+                        }
+                        Button("Delete", role: .destructive) {
+                            appState.delete(storedProfile)
+                        }
+                    }
+                    .buttonStyle(.bordered)
 
-                    Button("Apply") {
-                        appState.apply(storedProfile)
-                    }
-                    Button("Duplicate") {
-                        appState.duplicate(storedProfile)
-                    }
-                    Button("Override") {
-                        appState.overwriteWithCurrentDock(storedProfile)
-                    }
-                    Button("Delete", role: .destructive) {
-                        appState.delete(storedProfile)
-                    }
+                    Text("\(storedProfile.profile.applications.count) apps, \(storedProfile.profile.others.count) others")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.bordered)
             }
-
-            Text("\(storedProfile.profile.applications.count) apps, \(storedProfile.profile.others.count) others")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.leading, 24)
         }
         .padding(.vertical, 8)
-        .padding(.horizontal, 6)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
         .background {
             GeometryReader { proxy in
                 Color.clear

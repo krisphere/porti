@@ -4,7 +4,7 @@ import SwiftUI
 struct MenuBarContentView: View {
     @ObservedObject var appState: AppState
     @ObservedObject var appUpdater: AppUpdater
-    @ObservedObject var windowCoordinator: WindowCoordinator
+    @ObservedObject var preferencesSelection: PreferencesSelection
 
     var body: some View {
         Group {
@@ -53,17 +53,17 @@ struct MenuBarContentView: View {
             }
 
             Button {
-                windowCoordinator.showManageProfiles(appState: appState)
+                openSettings(tab: .profiles)
             } label: {
-                Label("Manage Profiles", systemImage: "square.and.pencil")
+                Label("Manage Profiles...", systemImage: "square.and.pencil")
             }
 
             Divider()
 
             Button {
-                windowCoordinator.showSettings(appState: appState, appUpdater: appUpdater)
+                openSettings(tab: .settings)
             } label: {
-                Label("Settings", systemImage: "gearshape")
+                Label("Settings...", systemImage: "gearshape")
             }
 
             Button {
@@ -74,7 +74,7 @@ struct MenuBarContentView: View {
             .disabled(!appUpdater.isConfigured || !appUpdater.canCheckForUpdates)
 
             Button {
-                windowCoordinator.showAbout()
+                openSettings(tab: .about)
             } label: {
                 Label("About Porti", systemImage: "info.circle")
             }
@@ -109,5 +109,10 @@ struct MenuBarContentView: View {
         .onAppear {
             appState.refreshAll()
         }
+    }
+
+    private func openSettings(tab: PortiWindowTab) {
+        preferencesSelection.tab = tab
+        PortiSettingsPresenter.request(tab: tab)
     }
 }

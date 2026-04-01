@@ -58,7 +58,7 @@ Expected public key:
 1. Build the app bundle:
 
 ```bash
-PORTI_VERSION="0.1.5" \
+PORTI_VERSION="0.1.6" \
 PORTI_BUILD="1" \
 ./scripts/package-app.sh
 ```

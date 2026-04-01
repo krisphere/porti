@@ -40,7 +40,7 @@ Your packaged `Porti.app/Contents/Info.plist` needs values like:
 
 ```xml
 <key>CFBundleShortVersionString</key>
-<string>0.1.5</string>
+<string>0.1.6</string>
 <key>CFBundleVersion</key>
 <string>1</string>
 <key>SUFeedURL</key>
@@ -57,7 +57,7 @@ This repo includes a packaging template and script for that:
 Example:
 
 ```bash
-PORTI_VERSION="0.1.5" \
+PORTI_VERSION="0.1.6" \
 PORTI_BUILD="1" \
 ./scripts/package-app.sh
 ```

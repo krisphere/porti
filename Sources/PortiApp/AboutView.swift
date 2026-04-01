@@ -43,7 +43,7 @@ struct AboutView: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 320)
         }
-        .frame(width: 420, height: 300)
-        .padding(28)
+        .padding(.vertical, 24)
+        .frame(maxWidth: .infinity)
     }
 }

@@ -51,7 +51,7 @@ Release setup notes live in [docs/auto-update.md](./docs/auto-update.md).
 To package a distributable app bundle:
 
 ```bash
-PORTI_VERSION="0.1.5" \
+PORTI_VERSION="0.1.6" \
 PORTI_BUILD="1" \
 ./scripts/package-app.sh
 ```
