@@ -58,7 +58,7 @@ Expected public key:
 1. Build the app bundle:
 
 ```bash
-PORTI_VERSION="0.1.7" \
+PORTI_VERSION="0.1.8" \
 PORTI_BUILD="1" \
 ./scripts/package-app.sh
 ```
@@ -76,13 +76,13 @@ SPARKLE_BIN_DIR="$HOME/tools/Sparkle/bin" \
 6. Verify the release feed resolves at:
 
 ```text
-https://github.com/krisphere/porti/releases/latest/download/appcast.xml
+https://github.com/kysz/porti/releases/latest/download/appcast.xml
 ```
 
 ## Current Release Identity
 
 - Bundle identifier: `io.github.kysz.porti`
-- Repository: `https://github.com/krisphere/porti`
+- Repository: `https://github.com/kysz/porti`
 - Sparkle public key: `1lnMBb7o0WzU8i/RDS+2oLm4G2m3FfCDvy6GpC4Duo0=`
 
 ## Important Note

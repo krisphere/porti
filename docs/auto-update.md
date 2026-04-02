@@ -21,8 +21,8 @@ When those keys are missing, Porti disables update actions and shows a configura
 
 Recommended URLs:
 
-- appcast: `https://github.com/krisphere/porti/releases/latest/download/appcast.xml`
-- releases: `https://github.com/krisphere/porti/releases`
+- appcast: `https://github.com/kysz/porti/releases/latest/download/appcast.xml`
+- releases: `https://github.com/kysz/porti/releases`
 
 ## One-Time Sparkle Setup
 
@@ -40,11 +40,11 @@ Your packaged `Porti.app/Contents/Info.plist` needs values like:
 
 ```xml
 <key>CFBundleShortVersionString</key>
-<string>0.1.7</string>
+<string>0.1.8</string>
 <key>CFBundleVersion</key>
 <string>1</string>
 <key>SUFeedURL</key>
-<string>https://github.com/krisphere/porti/releases/latest/download/appcast.xml</string>
+<string>https://github.com/kysz/porti/releases/latest/download/appcast.xml</string>
 <key>SUPublicEDKey</key>
 <string>1lnMBb7o0WzU8i/RDS+2oLm4G2m3FfCDvy6GpC4Duo0=</string>
 ```
@@ -57,7 +57,7 @@ This repo includes a packaging template and script for that:
 Example:
 
 ```bash
-PORTI_VERSION="0.1.7" \
+PORTI_VERSION="0.1.8" \
 PORTI_BUILD="1" \
 ./scripts/package-app.sh
 ```

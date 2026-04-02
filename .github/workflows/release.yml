@@ -21,7 +21,7 @@ jobs:
 
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      PORTI_APPCAST_URL: https://github.com/krisphere/porti/releases/latest/download/appcast.xml
+      PORTI_APPCAST_URL: https://github.com/kysz/porti/releases/latest/download/appcast.xml
 
     steps:
       - name: Check out repository
