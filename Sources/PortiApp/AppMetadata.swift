@@ -3,8 +3,8 @@ import Foundation
 
 @MainActor
 enum AppMetadata {
-    static let fallbackShortVersion = "0.1.8"
-    static let fallbackBuildVersion = "0001008"
+    static let fallbackShortVersion = "0.1.9"
+    static let fallbackBuildVersion = "0001009"
     static let repositoryURL = URL(string: "https://github.com/kysz/porti")!
 
     static var shortVersion: String {

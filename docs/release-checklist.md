@@ -19,7 +19,7 @@ cd /path/to/Sparkle
 ```
 
 4. Record these values in your password manager or other secure storage:
-- Sparkle public key: `1lnMBb7o0WzU8i/RDS+2oLm4G2m3FfCDvy6GpC4Duo0=`
+- Sparkle public key: `INY1WwN78I1YxgmJuCDmF+OIDam4jBj5jwBZXkiLFHs=`
 - Private key export path
 - SHA-256 of the exported private key file
 
@@ -50,7 +50,7 @@ cd /path/to/Sparkle
 Expected public key:
 
 ```text
-1lnMBb7o0WzU8i/RDS+2oLm4G2m3FfCDvy6GpC4Duo0=
+INY1WwN78I1YxgmJuCDmF+OIDam4jBj5jwBZXkiLFHs=
 ```
 
 ## Per-Release Steps
@@ -58,7 +58,7 @@ Expected public key:
 1. Build the app bundle:
 
 ```bash
-PORTI_VERSION="0.1.8" \
+PORTI_VERSION="0.1.9" \
 PORTI_BUILD="1" \
 ./scripts/package-app.sh
 ```
@@ -83,7 +83,7 @@ https://github.com/kysz/porti/releases/latest/download/appcast.xml
 
 - Bundle identifier: `io.github.kysz.porti`
 - Repository: `https://github.com/kysz/porti`
-- Sparkle public key: `1lnMBb7o0WzU8i/RDS+2oLm4G2m3FfCDvy6GpC4Duo0=`
+- Sparkle public key: `INY1WwN78I1YxgmJuCDmF+OIDam4jBj5jwBZXkiLFHs=`
 
 ## Important Note
 
