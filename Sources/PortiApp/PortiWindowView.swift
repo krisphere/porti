@@ -310,9 +310,6 @@ private struct WindowConfigurator: NSViewRepresentable {
             return
         }
 
-        window.title = "Porti"
-        window.titleVisibility = .visible
-        window.titlebarAppearsTransparent = false
         window.toolbarStyle = .preference
 
         if !coordinator.didBringWindowToFront {
