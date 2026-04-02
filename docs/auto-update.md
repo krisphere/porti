@@ -73,11 +73,14 @@ That script:
 
 ## Publishing a Release
 
-1. Build a new `Porti.app` release bundle with `scripts/package-app.sh`.
-2. Place the generated `.zip` archive in a local updates folder.
-3. Run `generate_appcast` from the Sparkle distribution against that folder.
-4. Upload the archive to GitHub Releases.
-5. Upload `appcast.xml` and any delta files as release assets.
+Use the local release artifact as the canonical one:
+
+1. Build `dist/Porti-<version>.zip` locally with `scripts/package-app.sh`.
+2. Create the GitHub release from that exact local zip with `gh release create`.
+3. Generate `appcast.xml` from that same zip, not from a rebuilt CI artifact.
+4. Upload `appcast.xml` to the same release with `gh release upload`.
+5. Verify the release asset digest matches the local zip you inspected.
+6. Verify `releases/latest/download/appcast.xml` resolves and points at the tagged zip.
 
 ## GitHub Actions
 
@@ -89,7 +92,10 @@ Current behavior:
 - uploads the zip as a workflow artifact
 - creates or updates a GitHub release
 
-The recommended path for shipping is still to publish the locally verified `dist/Porti-<version>.zip`, because that guarantees the release asset matches the artifact you inspected before upload. Use the GitHub workflow only when you intentionally want a CI-built artifact.
+The default shipping path is not this workflow. The recommended path is to
+publish the locally verified `dist/Porti-<version>.zip`, because that guarantees
+the release asset matches the artifact you inspected before upload. Use the
+GitHub workflow only when you intentionally want a CI-built artifact.
 
 The workflow intentionally does **not** generate the appcast yet, because Sparkle's `generate_appcast` depends on the private signing key being available in a macOS keychain. Keeping that step manual avoids storing or importing the private key into GitHub Actions until you decide how you want to handle that securely.
 
