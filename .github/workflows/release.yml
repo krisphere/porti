@@ -9,9 +9,6 @@ on:
       build:
         description: Optional build number override. Leave blank to derive from the version.
         required: false
-  push:
-    tags:
-      - "v*"
 
 jobs:
   build-release:
@@ -32,11 +29,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          else
-            VERSION="${{ github.event.inputs.version }}"
-          fi
+          VERSION="${{ github.event.inputs.version }}"
 
           if [[ -n "${{ github.event.inputs.build }}" ]]; then
             BUILD="${{ github.event.inputs.build }}"

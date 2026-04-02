@@ -65,6 +65,8 @@ struct PortiPreferencesView: View {
     @State private var contentHeight: CGFloat = PortiWindowTab.profiles.preferredHeight
     @State private var isPaneContentVisible = true
     @State private var pendingRevealWorkItem: DispatchWorkItem?
+    @State private var windowResizeRevision = 0
+    @State private var shouldAnimateWindowResize = false
 
     var body: some View {
         tabViewContent
@@ -77,6 +79,9 @@ struct PortiPreferencesView: View {
         case .settings, .about:
             tab.preferredHeight
         }
+
+        shouldAnimateWindowResize = animate
+        windowResizeRevision += 1
 
         let change = {
             contentWidth = tab.preferredWidth
@@ -159,7 +164,15 @@ struct PortiPreferencesView: View {
         .padding(.horizontal, 0)
         .padding(.vertical, 0)
         .frame(width: contentWidth, height: contentHeight)
-        .background(WindowConfigurator())
+        .background(
+            WindowConfigurator(
+                contentWidth: contentWidth,
+                contentHeight: contentHeight,
+                animateResize: shouldAnimateWindowResize,
+                resizeDuration: Self.resizeDuration,
+                resizeRevision: windowResizeRevision
+            )
+        )
         .onAppear {
             appState.refreshAll()
             updateLayout(for: selection.tab, animate: false)
@@ -263,21 +276,35 @@ private struct WindowMessageBanner: View {
 }
 
 private struct WindowConfigurator: NSViewRepresentable {
+    let contentWidth: CGFloat
+    let contentHeight: CGFloat
+    let animateResize: Bool
+    let resizeDuration: Double
+    let resizeRevision: Int
+
+    final class Coordinator {
+        var lastAppliedRevision = -1
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
-            configureWindow(for: view)
+            configureWindow(for: view, coordinator: context.coordinator)
         }
         return view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {
         DispatchQueue.main.async {
-            configureWindow(for: nsView)
+            configureWindow(for: nsView, coordinator: context.coordinator)
         }
     }
 
-    private func configureWindow(for view: NSView) {
+    private func configureWindow(for view: NSView, coordinator: Coordinator) {
         guard let window = view.window else {
             return
         }
@@ -286,5 +313,38 @@ private struct WindowConfigurator: NSViewRepresentable {
         window.titleVisibility = .visible
         window.titlebarAppearsTransparent = false
         window.toolbarStyle = .preference
+
+        guard coordinator.lastAppliedRevision != resizeRevision else {
+            return
+        }
+
+        coordinator.lastAppliedRevision = resizeRevision
+        applyWindowSize(to: window)
+    }
+
+    private func applyWindowSize(to window: NSWindow) {
+        let targetContentSize = NSSize(width: contentWidth, height: contentHeight)
+        let currentContentSize = window.contentLayoutRect.size
+        guard abs(currentContentSize.width - targetContentSize.width) > 0.5 ||
+                abs(currentContentSize.height - targetContentSize.height) > 0.5 else {
+            return
+        }
+
+        let currentFrame = window.frame
+        let targetFrame = window.frameRect(forContentRect: NSRect(origin: .zero, size: targetContentSize))
+
+        var newFrame = currentFrame
+        newFrame.origin.y += currentFrame.height - targetFrame.height
+        newFrame.size = targetFrame.size
+
+        if animateResize {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = resizeDuration
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                window.animator().setFrame(newFrame, display: true)
+            }
+        } else {
+            window.setFrame(newFrame, display: true)
+        }
     }
 }

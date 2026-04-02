@@ -40,7 +40,7 @@ Your packaged `Porti.app/Contents/Info.plist` needs values like:
 
 ```xml
 <key>CFBundleShortVersionString</key>
-<string>0.1.10</string>
+<string>0.1.11</string>
 <key>CFBundleVersion</key>
 <string>1</string>
 <key>SUFeedURL</key>
@@ -57,7 +57,7 @@ This repo includes a packaging template and script for that:
 Example:
 
 ```bash
-PORTI_VERSION="0.1.10" \
+PORTI_VERSION="0.1.11" \
 PORTI_BUILD="1" \
 ./scripts/package-app.sh
 ```
@@ -88,6 +88,8 @@ Current behavior:
 - builds `dist/Porti-<version>.zip`
 - uploads the zip as a workflow artifact
 - creates or updates a GitHub release
+
+The recommended path for shipping is still to publish the locally verified `dist/Porti-<version>.zip`, because that guarantees the release asset matches the artifact you inspected before upload. Use the GitHub workflow only when you intentionally want a CI-built artifact.
 
 The workflow intentionally does **not** generate the appcast yet, because Sparkle's `generate_appcast` depends on the private signing key being available in a macOS keychain. Keeping that step manual avoids storing or importing the private key into GitHub Actions until you decide how you want to handle that securely.
 
