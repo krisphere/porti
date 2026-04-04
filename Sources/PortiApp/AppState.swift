@@ -27,6 +27,7 @@ final class AppState: ObservableObject {
     @Published var showNotifications: Bool
     @Published var launchAtLogin: Bool
     @Published private(set) var activeFocusProfileName: String?
+    @Published private(set) var windowStatePermissionStatus: WindowStatePermissionStatus
 
     let dockStore = DockPreferencesStore()
     let profileStore = ProfileStore()
@@ -39,6 +40,7 @@ final class AppState: ObservableObject {
     private let launchAtLoginKey = "porti.preferences.launchAtLogin"
     private let launchAtLoginController = LaunchAtLoginController()
     private let notificationController = NotificationController()
+    private let windowStateController = WindowStateController()
     private var refreshTimer: Timer?
     private var lastObservedFocusProfileID: String?
     private var focusSelectionRefreshInFlight = false
@@ -49,11 +51,14 @@ final class AppState: ObservableObject {
         quitOtherApplicationsOnApply = defaults.object(forKey: quitOtherApplicationsOnApplyKey) as? Bool ?? defaultPreferences.quitOtherApplicationsOnApply
         showNotifications = defaults.object(forKey: showNotificationsKey) as? Bool ?? defaultPreferences.showNotifications
         launchAtLogin = defaults.object(forKey: launchAtLoginKey) as? Bool ?? launchAtLoginController.currentStatus()
+        windowStatePermissionStatus = windowStateController.permissionStatus()
         refreshAll()
         startRefreshTimer()
     }
 
     func refreshAll() {
+        windowStatePermissionStatus = windowStateController.permissionStatus()
+
         do {
             let loadedProfiles = try profileStore.listProfiles().map { url in
                 StoredProfile(url: url, profile: try profileStore.load(from: url))
@@ -335,6 +340,18 @@ final class AppState: ObservableObject {
         defaults.set(showNotifications, forKey: showNotificationsKey)
     }
 
+    func requestWindowStateAccessibilityPermission() {
+        windowStatePermissionStatus = windowStateController.requestAccessibilityPermission()
+    }
+
+    func openAccessibilitySettings() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") else {
+            return
+        }
+
+        NSWorkspace.shared.open(url)
+    }
+
     private func apply(_ storedProfile: StoredProfile, trigger: DockApplyTrigger) {
         if trigger.requiresConfirmation,
            confirmBeforeApply,
@@ -342,9 +359,12 @@ final class AppState: ObservableObject {
             return
         }
 
+        let windowStateSnapshot = windowStateController.captureCurrentWindowStates()
+
         do {
             let report = try dockStore.apply(profile: storedProfile.profile)
             let quitReport = quitOtherApplicationsOnApply ? requestQuitForApplicationsNotInProfile(storedProfile.profile) : QuitRequestReport()
+            scheduleWindowStateRestore(windowStateSnapshot)
             defaults.set(storedProfile.url.path, forKey: lastAppliedProfilePathKey)
             showFeedback(
                 inlineWarning: warningText(for: report, quitReport: quitReport),
@@ -646,6 +666,16 @@ final class AppState: ObservableObject {
             }
         }
         refreshTimer?.tolerance = 0.5
+    }
+
+    private func scheduleWindowStateRestore(_ snapshot: WindowStateSnapshot?) {
+        guard snapshot != nil else {
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self] in
+            self?.windowStateController.restoreWindowStates(snapshot)
+        }
     }
 }
 

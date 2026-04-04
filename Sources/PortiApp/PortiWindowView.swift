@@ -6,7 +6,7 @@ enum PortiWindowTab: String, CaseIterable, Identifiable {
     case about
 
     static let defaultHeight: CGFloat = 580
-    static let settingsContentHeight: CGFloat = 583
+    static let settingsContentHeight: CGFloat = 736
     static let settingsWindowHeight: CGFloat = settingsContentHeight
     static let aboutWindowHeight: CGFloat = 150
     static let profilesButtonGap: CGFloat = 20
